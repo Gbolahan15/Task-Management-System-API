@@ -16,7 +16,7 @@
         <ol>
             {% for task in tasks %}
             <li class="pb-3">
-                {{ task.title }}
+                {{ task.title }} ( {{ task.created_at }} )
                 {% if task.completed %}
                     ✔️
                 {% else %}

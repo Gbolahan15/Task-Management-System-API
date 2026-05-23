@@ -24,7 +24,7 @@ def task_read_view(request):
 
 # Update/Edit a task
 def task_update_view(request, task_id):
-    task = get_object_or_404(Tasks, id=task_id)
+    task = get_object_or_404(Tasks, id=task_id) # get_object_or_404 fetches an object from the database and if it doesn't exist, automatically show a 404 error page .It helps to handle the error without crashing the app
     if request.method == "POST":
         form = TaskForm(request.POST, instance=task)
         if form.is_valid():
