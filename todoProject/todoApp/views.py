@@ -1,6 +1,8 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import Tasks
 from .forms import TaskForm
+from .serializers import TaskSerializer
+from rest_framework import viewsets
 
 # Create your views here.
 # Applying CRUD rule (Create, Read, Update, Delete)
@@ -48,3 +50,7 @@ def task_delete_all_view(request):
         Tasks.objects.all().delete()
         return redirect('task_list')
     return render(request, 'delete_all.html')
+
+class TaskViewset(viewsets.ModelViewSet):
+    queryset = Tasks.objects.all()
+    serializer_class = TaskSerializer
