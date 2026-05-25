@@ -2,8 +2,11 @@ from django.shortcuts import render, redirect, get_object_or_404
 from .models import Tasks
 from .forms import TaskForm
 from .serializers import TaskSerializer, RegisterSerializer
-from rest_framework import viewsets, generics
+from rest_framework import viewsets, generics, status
 from django.contrib.auth.models import User
+from django.contrib.auth import authenticate
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
 # Create your views here.
 # Applying CRUD rule (Create, Read, Update, Delete)
@@ -59,3 +62,16 @@ class TaskViewset(viewsets.ModelViewSet):
 class RegisterView(generics.CreateAPIView):
     queryset = User.objects.all()
     serializer_class = RegisterSerializer
+
+class LoginView(APIView):
+    def post(self, request):
+        username = request.data.get('username')
+        password = request.data.get('password')
+        user = authenticate(username=username, password=password)
+
+        if user is not None:
+            return Response({
+                "message": "Login successful",
+                "user": user.username
+            })
+        return Response({"message": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED)
