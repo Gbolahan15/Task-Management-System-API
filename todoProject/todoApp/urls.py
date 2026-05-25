@@ -13,4 +13,5 @@ urlpatterns = [
     path('delete-all/', views.task_delete_all_view, name="task_delete_all"),
 
     path('api/', include(router.urls)),
+    path('register/', views.RegisterView.as_view(), name='register'),
 ]
