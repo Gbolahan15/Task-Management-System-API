@@ -7,6 +7,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.permissions import IsAuthenticated
 
 # Create your views here.
 # Applying CRUD rule (Create, Read, Update, Delete)
@@ -56,8 +57,19 @@ def task_delete_all_view(request):
     return render(request, 'delete_all.html')
 
 class TaskViewset(viewsets.ModelViewSet):
-    queryset = Tasks.objects.all()
+    # queryset = Tasks.objects.all()
     serializer_class = TaskSerializer
+    permission_classes = [IsAuthenticated]
+    
+    def get_queryset(self):
+        return Tasks.objects.filter(user=self.request.user)
+    
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+
+    # permission_classes helps to prevent anonymous users from accessing tasks
+    # get_queryset... each user only sees their own tasks
+    # perform_create... when task is created, django automatically attaches logged-in user. You no longer manually assign users
 
 class RegisterView(generics.CreateAPIView):
     queryset = User.objects.all()
