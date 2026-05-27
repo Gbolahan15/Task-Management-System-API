@@ -5,6 +5,7 @@ from rest_framework_simplejwt.views import (TokenObtainPairView, TokenRefreshVie
 
 router = DefaultRouter()
 router.register('tasks', views.TaskViewset, basename='tasks')
+router.register('categories', views.CategoryViewset, basename='categories')
 
 urlpatterns = [
     path('', views.task_read_view, name="task_list"),

@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from .models import Tasks
+from .models import Tasks, Category
 from .forms import TaskForm
-from .serializers import TaskSerializer, RegisterSerializer
+from .serializers import TaskSerializer, RegisterSerializer, CategorySerializer
 from rest_framework import viewsets, generics, status
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
@@ -87,3 +87,13 @@ class LoginView(APIView):
                 "user": user.username
             })
         return Response({"message": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED)
+    
+class CategoryViewset(viewsets.ModelViewSet):
+    serializer_class = CategorySerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return Category.objects.filter(user=self.request.user)
+    
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)

@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Tasks
+from .models import Tasks, Category
 from django.contrib.auth.models import User
 
 class TaskSerializer(serializers.ModelSerializer):
@@ -20,3 +20,9 @@ class RegisterSerializer(serializers.ModelSerializer):
         return user
     
 # This RegisterSerializer creates new user, hashes passwords properly and hides password from responses
+
+class CategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Category
+        fields = ['id', 'name', 'user']
+        read_only_fields = ['user']
