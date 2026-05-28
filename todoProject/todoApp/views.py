@@ -66,10 +66,13 @@ class TaskViewset(viewsets.ModelViewSet):
 
     pagination_class = TaskPagination
 
-    filter_backends = [DjangoFilterBackend, filters.SearchFilter]
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     filterset_fields = ['completed', 'category'] # filter by completed status and category
     search_fields = ['title', 'category__name'] # search by title and category name (category__name is for searching by category name instead of id)
     
+    ordering_fields = ['created_at', 'title', 'completed'] # we are allowing these fields to be sorted
+    ordering = ['-created_at'] # the default order meaning newest tasks first
+
     def get_queryset(self):
         return Tasks.objects.filter(user=self.request.user)
     
