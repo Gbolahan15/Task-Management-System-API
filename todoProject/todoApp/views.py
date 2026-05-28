@@ -8,6 +8,8 @@ from django.contrib.auth import authenticate
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import filters
 
 # Create your views here.
 # Applying CRUD rule (Create, Read, Update, Delete)
@@ -60,6 +62,10 @@ class TaskViewset(viewsets.ModelViewSet):
     # queryset = Tasks.objects.all()
     serializer_class = TaskSerializer
     permission_classes = [IsAuthenticated]
+
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter]
+    filterset_fields = ['completed', 'category'] # filter by completed status and category
+    search_fields = ['title', 'category__name'] # search by title and category name (category__name is for searching by category name instead of id)
     
     def get_queryset(self):
         return Tasks.objects.filter(user=self.request.user)
