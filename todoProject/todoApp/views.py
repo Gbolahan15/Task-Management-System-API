@@ -11,6 +11,7 @@ from rest_framework.permissions import IsAuthenticated
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters
 from .pagination import TaskPagination
+from .permissions import IsOwner
 
 # Create your views here.
 # Applying CRUD rule (Create, Read, Update, Delete)
@@ -62,7 +63,7 @@ def task_delete_all_view(request):
 class TaskViewset(viewsets.ModelViewSet):
     # queryset = Tasks.objects.all()
     serializer_class = TaskSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsOwner]
 
     pagination_class = TaskPagination
 
