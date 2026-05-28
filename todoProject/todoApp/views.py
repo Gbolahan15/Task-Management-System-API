@@ -12,6 +12,8 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters
 from .pagination import TaskPagination
 from .permissions import IsOwner
+from rest_framework.decorators import action
+from rest_framework.response import Response
 
 # Create your views here.
 # Applying CRUD rule (Create, Read, Update, Delete)
@@ -110,3 +112,29 @@ class CategoryViewset(viewsets.ModelViewSet):
     
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
+
+@action(detail=True, methods=['post'])
+def toggle(self, request, pk=None):
+    task = self.get_object()
+    task.completed = not task.completed
+    task.save()
+    return Response({
+        "id": task.id,
+        "title": task.title,
+        "completed": task.completed,
+    })
+
+'''
+Quick example
+api/tasks/29/toggle/ (if completed is false, it will become true. If completed is true, it will become false)
+'''
+
+@action(detail=False, methods=['post'])
+def mark_all_completed(self, request):
+    tasks = self.get_queryset()
+    tasks.update(completed=True)
+    return Response({
+        "message": "All tasks marked as completed"
+    })
+
+# api/tasks/mark-all-completed/ (this will mark all tasks as completed in one request)
