@@ -10,6 +10,7 @@ from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters
+from .pagination import TaskPagination
 
 # Create your views here.
 # Applying CRUD rule (Create, Read, Update, Delete)
@@ -62,6 +63,8 @@ class TaskViewset(viewsets.ModelViewSet):
     # queryset = Tasks.objects.all()
     serializer_class = TaskSerializer
     permission_classes = [IsAuthenticated]
+
+    pagination_class = TaskPagination
 
     filter_backends = [DjangoFilterBackend, filters.SearchFilter]
     filterset_fields = ['completed', 'category'] # filter by completed status and category
