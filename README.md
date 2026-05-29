@@ -94,7 +94,9 @@ pip install -r requirements.txt
 python manage.py migrate
 python manage.py runserver
 
-👨‍💻 Author
+---
+
+## 👨‍💻 Author
 
 Built by me... a backend developer learning Django REST Framework.
 
