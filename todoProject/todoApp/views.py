@@ -86,6 +86,20 @@ class TaskViewset(viewsets.ModelViewSet):
     # get_queryset... each user only sees their own tasks
     # perform_create... when task is created, django automatically attaches logged-in user. You no longer manually assign users
 
+    @action(detail=False, methods=['get'])
+    def stats(self, request):
+        user_tasks = self.get_queryset()
+
+        total = user_tasks.count()
+        completed = user_tasks.filter(completed=True).count()
+        pending = user_tasks.filter(completed=False).count()
+
+        return Response({
+            "total_tasks": total,
+            "completed_tasks": completed,
+            "pending_tasks": pending
+        })
+
 class RegisterView(generics.CreateAPIView):
     queryset = User.objects.all()
     serializer_class = RegisterSerializer
