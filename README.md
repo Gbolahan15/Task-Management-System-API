@@ -85,6 +85,15 @@ Swagger UI available at:
 
 ---
 
+## 👨‍💻 Project Goal
+
+This project demonstrates:
+- Backend API design
+- Authentication & authorization
+- REST API best practices
+- Production-style features
+- Developer documentation
+
 ## ⚙️ Installation
 
 ```bash
@@ -96,7 +105,4 @@ python manage.py runserver
 
 ---
 
-## 👨‍💻 Author
-
-Built by me... a backend developer learning Django REST Framework.
 
