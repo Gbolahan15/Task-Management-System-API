@@ -77,7 +77,7 @@ class TaskViewset(viewsets.ModelViewSet):
     ordering = ['-created_at'] # the default order meaning newest tasks first
 
     def get_queryset(self):
-        return Tasks.objects.filter(user=self.request.user)
+        return Tasks.objects.filter(user=self.request.user, is_deleted=False) # only return tasks that belong to the logged-in user and are not marked as deleted
     
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
@@ -99,6 +99,34 @@ class TaskViewset(viewsets.ModelViewSet):
             "completed_tasks": completed,
             "pending_tasks": pending
         })
+
+    def destroy(self, request, *args, **kwargs):
+        task = self.get_object()
+        task.is_deleted = True
+        task.save()
+        return Response({
+            "message": "Task moved to trash"
+        })
+        #Instead of delete (remove from database), it marks the task as deleted. This way we can implement a "trash" feature where users can restore deleted tasks if they change their mind.
+
+    #View trash endpoint
+    @action(detail=False, methods=['get'])
+    def trash(self, request):
+        deleted_tasks = Tasks.objects.filter(user=request.user, is_deleted=True)
+        serializer = self.get_serializer(deleted_tasks, many=True)
+        return Response(serializer.data)
+     # api/tasks/trash/ (this will show ONLY deleted tasks)
+
+    # Restore endpoint
+    @action(detail=True, methods=['post'])
+    def restore(self, request, pk=None):
+        task = Tasks.objects.get(pk=pk, user=request.user)
+        task.is_deleted = False
+        task.save()
+        return Response({
+            "message": "Task restored successfully"
+        })
+        # api/tasks/29/restore/ (this will restore the deleted task with id 29)
 
 class RegisterView(generics.CreateAPIView):
     queryset = User.objects.all()
