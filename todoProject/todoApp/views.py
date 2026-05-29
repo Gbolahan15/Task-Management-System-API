@@ -14,6 +14,7 @@ from .pagination import TaskPagination
 from .permissions import IsOwner
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from drf_yasg.utils import swagger_auto_schema
 
 # Create your views here.
 # Applying CRUD rule (Create, Read, Update, Delete)
@@ -86,6 +87,7 @@ class TaskViewset(viewsets.ModelViewSet):
     # get_queryset... each user only sees their own tasks
     # perform_create... when task is created, django automatically attaches logged-in user. You no longer manually assign users
 
+    @swagger_auto_schema(tags=['Stats'])
     @action(detail=False, methods=['get'])
     def stats(self, request):
         user_tasks = self.get_queryset()
@@ -110,6 +112,7 @@ class TaskViewset(viewsets.ModelViewSet):
         #Instead of delete (remove from database), it marks the task as deleted. This way we can implement a "trash" feature where users can restore deleted tasks if they change their mind.
 
     #View trash endpoint
+    @swagger_auto_schema(tags=['Tasks'])
     @action(detail=False, methods=['get'])
     def trash(self, request):
         deleted_tasks = Tasks.objects.filter(user=request.user, is_deleted=True)
@@ -118,6 +121,7 @@ class TaskViewset(viewsets.ModelViewSet):
      # api/tasks/trash/ (this will show ONLY deleted tasks)
 
     # Restore endpoint
+    @swagger_auto_schema(tags=['Tasks'])
     @action(detail=True, methods=['post'])
     def restore(self, request, pk=None):
         task = Tasks.objects.get(pk=pk, user=request.user)
@@ -127,6 +131,34 @@ class TaskViewset(viewsets.ModelViewSet):
             "message": "Task restored successfully"
         })
         # api/tasks/29/restore/ (this will restore the deleted task with id 29)
+
+    @swagger_auto_schema(tags=['Tasks'])
+    @action(detail=True, methods=['post'])
+    def toggle(self, request, pk=None):
+        task = self.get_object()
+        task.completed = not task.completed
+        task.save()
+        return Response({
+            "id": task.id,
+            "title": task.title,
+            "completed": task.completed,
+        })
+
+    '''
+    Quick example
+    api/tasks/29/toggle/ (if completed is false, it will become true. If completed is true, it will become false)
+    '''
+
+    @swagger_auto_schema(tags=['Tasks'])
+    @action(detail=False, methods=['post'])
+    def mark_all_completed(self, request):
+        tasks = self.get_queryset()
+        tasks.update(completed=True)
+        return Response({
+            "message": "All tasks marked as completed"
+        })
+
+    # api/tasks/mark-all-completed/ (this will mark all tasks as completed in one request)
 
 class RegisterView(generics.CreateAPIView):
     queryset = User.objects.all()
@@ -155,28 +187,3 @@ class CategoryViewset(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
 
-@action(detail=True, methods=['post'])
-def toggle(self, request, pk=None):
-    task = self.get_object()
-    task.completed = not task.completed
-    task.save()
-    return Response({
-        "id": task.id,
-        "title": task.title,
-        "completed": task.completed,
-    })
-
-'''
-Quick example
-api/tasks/29/toggle/ (if completed is false, it will become true. If completed is true, it will become false)
-'''
-
-@action(detail=False, methods=['post'])
-def mark_all_completed(self, request):
-    tasks = self.get_queryset()
-    tasks.update(completed=True)
-    return Response({
-        "message": "All tasks marked as completed"
-    })
-
-# api/tasks/mark-all-completed/ (this will mark all tasks as completed in one request)
