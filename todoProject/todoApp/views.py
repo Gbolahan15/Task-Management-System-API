@@ -15,7 +15,6 @@ from .permissions import IsOwner
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from drf_yasg.utils import swagger_auto_schema
-from django.http import JsonResponse
 
 # Create your views here.
 # Applying CRUD rule (Create, Read, Update, Delete)
@@ -33,11 +32,9 @@ def task_create_view(request):
     return render(request, 'create.html', {'form':form})
 
 # Read/List all tasks
-# def task_read_view(request):
-#     tasks = Tasks.objects.all()
-#     return render(request, 'list.html', {'tasks':tasks})
 def task_read_view(request):
-    return JsonResponse({"status": "API is working"})
+    tasks = Tasks.objects.all()
+    return render(request, 'list.html', {'tasks':tasks})
 
 # Update/Edit a task
 def task_update_view(request, task_id):
